@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getRecipes, getComments, createComment } from '../api/api';
+import { getRecipeById, getComments, createComment } from '../api/api';
 import { useApp } from '../context/AppContext';
 
 const CATEGORY_COLORS = {
@@ -25,21 +25,15 @@ export default function RecipeDetailPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [recipes, allComments] = await Promise.all([getRecipes(), getComments()]);
-        const found = recipes.find((r) => r._id === id);
-        if (!found) {
-          setError('Recipe not found.');
-          setLoading(false);
-          return;
+        const [recipeComments, recipeDetails] = await Promise.all([getComments(id), getRecipeById(id)]);
+        setRecipe(recipeDetails);
+        setComments(recipeComments);
+      } catch (err) {
+        if (err.message === 'RECIPE_NOT_FOUND') {
+          setError("This recipe doesn't exist or may have been removed.");
+        } else {
+          setError('Could not load recipe.');
         }
-        setRecipe(found);
-        setComments(
-          allComments.filter(
-            (c) => c.recipeId?._id === id || c.recipeId === id
-          )
-        );
-      } catch {
-        setError('Could not load recipe.');
       } finally {
         setLoading(false);
       }

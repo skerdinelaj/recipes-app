@@ -50,6 +50,21 @@ app.get('/api/recipes', async (req, res)=>{
     }
 })
 
+app.get('/api/recipes/:id', async (req, res)=>{
+    try {
+        const recipe = await Recipe.findById(req.params.id).populate('createdBy', 'name surname email');
+        if (!recipe) {
+            return res.status(404).send({ error: 'Recipe not found' });
+        }
+        res.status(200).send(recipe);
+    } catch (e) {
+        if (e.name === 'CastError') {
+            return res.status(404).send({ error: 'Recipe not found' });
+        }
+        res.status(500).send(e);
+    }
+})
+
 app.get('/api/users', async (req, res)=>{
     try {
         const users = await User.find()
@@ -61,9 +76,16 @@ app.get('/api/users', async (req, res)=>{
 
 app.get('/api/comments', async (req, res)=>{
     try{
-        const comments = await Comment.find().populate('commentedBy', 'name surname').populate('recipeId')
+        const filter = {};
+        if (req.query.recipeId) {
+            filter.recipeId = req.query.recipeId;
+        }
+        const comments = await Comment.find(filter).populate('commentedBy', 'name surname').populate('recipeId')
         res.status(200).send(comments)
     } catch(e) {
+        if (e.name === 'CastError') {
+            return res.status(400).send({ error: 'Invalid recipeId' });
+        }
         res.status(500).send(e)
     }
 })

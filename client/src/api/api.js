@@ -12,8 +12,18 @@ export async function getRecipes() {
   return res.json();
 }
 
-export async function getComments() {
-  const res = await fetch(`${BASE}/comments`);
+export async function getRecipeById(id) {
+  const res = await fetch(`${BASE}/recipes/${id}`);
+  if (res.status === 404) throw new Error('RECIPE_NOT_FOUND');
+  if (!res.ok) throw new Error('Failed to fetch recipe');
+  return res.json();
+}
+
+export async function getComments(recipeId) {
+  const url = recipeId
+    ? `${BASE}/comments?recipeId=${recipeId}`
+    : `${BASE}/comments`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error('Failed to fetch comments');
   return res.json();
 }

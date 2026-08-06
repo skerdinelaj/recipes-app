@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { getUsers, createUser } from '../api/api';
+import { loginUser, getUsers, createUser } from '../api/api';
 
 export default function LoginPage() {
   const { login } = useApp();
@@ -19,16 +19,11 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const users = await getUsers();
-      const user = users.find((u) => u.email === email.trim().toLowerCase());
-      if (!user) {
-        setError('No account found with that email. Try signing up.');
-      } else {
-        login(user);
-        navigate('/recipes');
-      }
-    } catch {
-      setError('Could not connect to the server. Make sure the backend is running.');
+      const user = await loginUser(email, password);
+      login(user);
+      navigate('/recipes');
+    } catch (err) {
+      setError(err.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -85,6 +80,14 @@ export default function LoginPage() {
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />

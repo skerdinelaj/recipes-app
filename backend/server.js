@@ -5,19 +5,43 @@ const cors = require('cors');
 const User = require('./models/User');
 const Comment = require('./models/Comment');
 const Recipe = require('./models/Recipe');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/users', async (req, res)=>{
+
+
+app.post('/api/auth/login', async (req, res)=>{
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).send({ error: 'User not found' });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).send({ error: 'Invalid password' });
+        }
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.send({ message: 'Login successful', token, name: user.name, surname: user.surname, email: user.email });
+    } catch (e) {
+        console.error(e);
+        res.status(400).send({ error: e.message });
+    }
+})
+
+app.post('/api/auth/register', async (req, res)=>{
     const user = new User(req.body);
     try {
+        user.password = await bcrypt.hash(user.password, 10);
         await user.save();
         res.status(201).send(user);
     } catch (e) {
-        res.status(400).send(e);
+        console.error(e);
+        res.status(400).send({ error: e.message });
     }
 })
 

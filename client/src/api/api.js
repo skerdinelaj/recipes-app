@@ -28,6 +28,16 @@ export async function getComments(recipeId) {
   return res.json();
 }
 
+export async function loginUser(email, password) {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (res.status === 401) throw new Error('INVALID_PASSWORD');
+  if (!res.ok) throw new Error('Failed to login');
+  return res.json();
+}
 export async function createRecipe(data) {
   const res = await fetch(`${BASE}/recipes`, {
     method: 'POST',
@@ -49,7 +59,7 @@ export async function createComment(data) {
 }
 
 export async function createUser(data) {
-  const res = await fetch(`${BASE}/users`, {
+  const res = await fetch(`${BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),

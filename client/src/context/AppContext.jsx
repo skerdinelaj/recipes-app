@@ -10,11 +10,13 @@ export function AppProvider({ children }) {
 
   const login = (user) => {
     localStorage.setItem('recipeUser', JSON.stringify(user));
+    localStorage.setItem('token', user.token);
     setCurrentUser(user);
   };
 
   const logout = () => {
     localStorage.removeItem('recipeUser');
+    localStorage.removeItem('token');
     setCurrentUser(null);
   };
 

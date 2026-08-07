@@ -1,19 +1,34 @@
 const BASE = '/api';
 
 export async function getUsers() {
-  const res = await fetch(`${BASE}/users`);
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/users`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!res.ok) throw new Error('Failed to fetch users');
   return res.json();
 }
 
 export async function getRecipes() {
-  const res = await fetch(`${BASE}/recipes`);
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/recipes`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!res.ok) throw new Error('Failed to fetch recipes');
   return res.json();
 }
 
 export async function getRecipeById(id) {
-  const res = await fetch(`${BASE}/recipes/${id}`);
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/recipes/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (res.status === 404) throw new Error('RECIPE_NOT_FOUND');
   if (!res.ok) throw new Error('Failed to fetch recipe');
   return res.json();
@@ -23,7 +38,12 @@ export async function getComments(recipeId) {
   const url = recipeId
     ? `${BASE}/comments?recipeId=${recipeId}`
     : `${BASE}/comments`;
-  const res = await fetch(url);
+  const token = localStorage.getItem('token');
+  const res = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
   if (!res.ok) throw new Error('Failed to fetch comments');
   return res.json();
 }
@@ -39,9 +59,10 @@ export async function loginUser(email, password) {
   return res.json();
 }
 export async function createRecipe(data) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE}/recipes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to create recipe');
@@ -49,9 +70,10 @@ export async function createRecipe(data) {
 }
 
 export async function createComment(data) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE}/comments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to create comment');

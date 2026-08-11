@@ -9,12 +9,19 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express();
 const authMiddleware = require('./middleware/auth');
+const { registerSchema, loginSchema } = require('./validation/authValidation');
+const { recipeSchema } = require('./validation/recipeValidation');
+const { commentSchema } = require('./validation/commentValidation');
 
 app.use(cors());
 app.use(express.json());
 
 
 app.post('/api/auth/login', async (req, res)=>{
+    const { error } = loginSchema.safeParse(req.body);
+    if (error) {
+        return res.status(400).send({ error: error.issues[0].message });
+    }
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
@@ -34,6 +41,10 @@ app.post('/api/auth/login', async (req, res)=>{
 })
 
 app.post('/api/auth/register', async (req, res)=>{
+    const { error } = registerSchema.safeParse(req.body);
+    if (error) {
+        return res.status(400).send({ error: error.issues[0].message });
+    }
     const user = new User(req.body);
     try {
         user.password = await bcrypt.hash(user.password, 10);
@@ -71,6 +82,11 @@ app.get('/api/comments', authMiddleware, async (req, res)=>{
 })
 
 app.post('/api/comments', authMiddleware, async (req, res)=>{
+    const { error } = commentSchema.safeParse(req.body);
+    if (error) {
+        const messages = error.issues.map(issue => issue.message);
+        return res.status(400).send({ errors: messages });
+    }
     const comment = new Comment({ ...req.body, commentedBy: req.user.userId });
     try {
         await comment.save();
@@ -81,6 +97,10 @@ app.post('/api/comments', authMiddleware, async (req, res)=>{
 })
 
 app.put('/api/comments/:id', authMiddleware, async (req, res)=>{
+    const { error } = commentSchema.safeParse(req.body);
+    if (error) {
+        return res.status(400).send({ error: error.issues[0].message });
+    }
     try {
         const updated = await Comment.findOneAndUpdate(
             { _id: req.params.id, commentedBy: req.user.userId },
@@ -139,6 +159,10 @@ app.get('/api/recipes/:id', authMiddleware, async (req, res)=>{
 })
 
 app.post('/api/recipes', authMiddleware, async (req, res)=>{
+    const { error } = recipeSchema.safeParse(req.body);
+    if (error) {
+        return res.status(400).send({ error: error.issues[0].message });
+    }
     const recipe = new Recipe({ ...req.body, createdBy: req.user.userId });
     try {
         await recipe.save();
@@ -164,6 +188,11 @@ app.delete('/api/recipes/:id', authMiddleware, async (req, res)=>{
 })
 
 app.patch('/api/recipes/:id', authMiddleware, async (req, res)=>{
+    const { error } = recipeSchema.safeParse(req.body);
+    if (error) {
+        const messages = error.issues.map(issue => issue.message);
+        return res.status(400).send({ errors: messages });
+    }
     try {
         const updated = await Recipe.findOneAndUpdate(
             { _id: req.params.id, createdBy: req.user.userId },

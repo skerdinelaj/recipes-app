@@ -92,3 +92,45 @@ export async function createUser(data) {
   }
   return res.json();
 }
+
+export async function updateRecipe(id, data) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/recipes/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update recipe');
+  return res.json();
+}
+
+export async function deleteRecipe(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/recipes/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to delete recipe');
+  return res.json();
+}
+
+export async function deleteComment(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/comments/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to delete comment');
+  return res.json();
+}
+
+export async function updateComment(id, data) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE}/comments/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update comment');
+  return res.json();
+}

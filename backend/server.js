@@ -112,6 +112,15 @@ app.get('/api/recipes', authMiddleware, asyncHandler(async (req, res) => {
     res.status(200).send(recipes);
 }))
 
+app.get('/api/recipes/stats/by-category', authMiddleware, asyncHandler(async (req, res) => {
+    const stats = await Recipe.aggregate([
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $project: { category: "$_id", count: 1, _id: 0 } }
+    ]);
+    res.status(200).send(stats);
+}))
+
 app.get('/api/recipes/:id', authMiddleware, asyncHandler(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id).populate('createdBy', 'name surname email');
     if (!recipe) {

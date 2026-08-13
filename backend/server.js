@@ -100,7 +100,15 @@ app.delete('/api/comments/:id', authMiddleware, asyncHandler(async (req, res) =>
 }))
 
 app.get('/api/recipes', authMiddleware, asyncHandler(async (req, res) => {
-    const recipes = await Recipe.find().populate('createdBy', 'name surname email');
+    const filter = {};
+    if (req.query.userId) {
+        filter.createdBy = req.query.userId;
+    }
+    if (req.query.category) {
+        filter.category = req.query.category;
+    }
+    const sortOrder = req.query.sort === 'oldest' ? 1 : -1;
+    const recipes = await Recipe.find(filter).sort({ createdAt: sortOrder }).populate('createdBy', 'name surname email');
     res.status(200).send(recipes);
 }))
 

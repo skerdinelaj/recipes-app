@@ -11,9 +11,16 @@ export async function getUsers() {
   return res.json();
 }
 
-export async function getRecipes() {
+export async function getRecipes(params = {}) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE}/recipes`, {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.set(key, value);
+    }
+  });
+  const qs = query.toString();
+  const res = await fetch(`${BASE}/recipes${qs ? `?${qs}` : ''}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

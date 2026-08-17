@@ -107,9 +107,23 @@ app.get('/api/recipes', authMiddleware, asyncHandler(async (req, res) => {
     if (req.query.category) {
         filter.category = req.query.category;
     }
+    if (req.query.search) {
+        filter.title = { $regex: req.query.search, $options: 'i' };
+    }
     const sortOrder = req.query.sort === 'oldest' ? 1 : -1;
-    const recipes = await Recipe.find(filter).sort({ createdAt: sortOrder }).populate('createdBy', 'name surname email');
-    res.status(200).send(recipes);
+    const numberToSkip = req.query.page && req.query.limit ? (req.query.page - 1) * req.query.limit : 0;
+    const resultsPePage = req.query.limit && parseInt(req.query.limit);
+    const totalRecipes = await Recipe.countDocuments(filter);
+    const recipes = await Recipe.find(filter)
+    .sort({ createdAt: sortOrder })
+    .populate('createdBy', 'name surname email')
+    .skip(numberToSkip)
+    .limit(resultsPePage);
+    res.status(200).send({
+        recipes,
+        totalRecipes,
+        TotalPAges: resultsPePage ? Math.ceil(totalRecipes / resultsPePage) : 1
+    });
 }))
 
 app.get('/api/recipes/stats/by-category', authMiddleware, asyncHandler(async (req, res) => {

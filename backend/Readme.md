@@ -1,8 +1,11 @@
-# RecipeBook
+# RecipeBook API
 
-A full-stack recipe sharing app with auth. Users can register, log in, create and share recipes, and comment on each other's recipes.
+The Express/MongoDB backend for [RecipeBook](../README.md), a full-stack recipe sharing app with auth. Users can register, log in, create and share recipes, and comment on each other's recipes.
 
-**Live demo:** https://recipes-app-aial.onrender.com/api/recipes
+- **Live API:** https://recipes-app-aial.onrender.com
+- **Live app (frontend):** https://recipes-app-skerdi.vercel.app
+
+> Hosted on Render's free tier — the first request after a period of inactivity can take up to a minute to wake the instance.
 
 ## Features
 
@@ -59,13 +62,15 @@ node server.js
 
 ### Frontend setup
 
+See [`client/README.md`](../client/README.md). In short:
+
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
-The frontend expects the backend running on `http://localhost:3000` (configured via Vite's dev server proxy).
+By default the frontend talks to the API via `VITE_API_URL` in `client/.env` (`http://localhost:3000` for local dev); Vite's dev server also proxies `/api` requests to that same address.
 
 ### Running tests
 
@@ -100,6 +105,12 @@ npm test
 | POST | `/api/comments` | Create a comment | Yes |
 | PUT | `/api/comments/:id` | Update a comment (owner only) | Yes |
 | DELETE | `/api/comments/:id` | Delete a comment (owner only) | Yes |
+
+Authenticated routes expect an `Authorization: Bearer <token>` header, using the JWT returned by `/api/auth/login`.
+
+## Deployment
+
+This API is deployed on Render, with MongoDB Atlas as the database. See [`../DEPLOYMENT.md`](../DEPLOYMENT.md) for environment variables and deploy steps.
 
 ## What I learned building this
 

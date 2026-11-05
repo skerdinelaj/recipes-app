@@ -1,0 +1,29 @@
+name: MongoDB keep-alive
+
+on:
+  schedule:
+    # Every 3 days at 06:00 UTC
+    - cron: '0 6 */3 * *'
+  workflow_dispatch: # lets you run it by hand from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci --omit=dev
+
+      - name: Ping Atlas
+        run: node scripts/keepalive.js
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}

@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-
-const AppContext = createContext(null);
+import { useState } from 'react';
+import { AppContext } from './useApp';
 
 export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -25,8 +24,4 @@ export function AppProvider({ children }) {
       {children}
     </AppContext.Provider>
   );
-}
-
-export function useApp() {
-  return useContext(AppContext);
 }

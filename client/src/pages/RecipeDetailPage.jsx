@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getRecipeById, getComments, createComment, deleteComment, updateComment, deleteRecipe, updateRecipe } from '../api/api';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/useApp';
 
 const CATEGORY_COLORS = {
   Breakfast: 'bg-yellow-100 text-yellow-700',

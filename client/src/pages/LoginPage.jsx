@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
-import { loginUser, getUsers, createUser } from '../api/api';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '../context/useApp';
+import { loginUser, createUser } from '../api/api';
 
 export default function LoginPage() {
   const { login } = useApp();

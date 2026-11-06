@@ -1,4 +1,4 @@
-const BASE = `${import.meta.env.VITE_API_URL}/api`;
+const BASE = `${import.meta.env.VITE_API_URL ?? ''}/api`;
 console.log('API base URL:', import.meta.env.VITE_API_URL);
 
 export async function getUsers() {
